@@ -1,9 +1,32 @@
 class List {
   toString {
+    // Setup Helper functions:
+    var isCircularHelper = fn (node, alreadyVisited) {
+      // Was this node already visited?
+      if (alreadyVisited.contains(node)) {
+        return true
+      } else {
+        // Check if any of the previous nodes (or this one) are in the children:
+        var newAlreadyVisited = alreadyVisited + [node]
+        for (element in node) {
+          if (element is List && isCircularHelper(element, newAlreadyVisited)) return true
+        }
+      }
+      return false
+    }
+    
+    var isCircular = fn {
+      for (element in this) {
+        if (element is List && isCircularHelper(element, [this])) return true
+      }
+      return false
+    }
+  
     // Handle circular lists:
     if (isCircular) {
       return "[...]"
     }
+    
     // Handle non-circular lists:
     var result = "["
     for (i in 0...count) {
@@ -36,27 +59,6 @@ class List {
       if (f.call(element)) result.add(element)
     }
     return result
-  }
-  
-  isCircular {
-    for (element in this) {
-      if (element is List && element.isCircularHelper([this])) return true
-    }
-    return false
-  }
-  
-  isCircularHelper(alreadyVisited) {
-    // Was this node already visited?
-    if (alreadyVisited.contains(this)) {
-      return true
-    } else {
-      // Check if any of the previous nodes (or this one) are in the children:
-      var newAlreadyVisited = alreadyVisited + [this]
-      for (element in this) {
-        if (element is List && element.isCircularHelper(newAlreadyVisited)) return true
-      }
-    }
-    return false
   }
   
   contains(that) {
